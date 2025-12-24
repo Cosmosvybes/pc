@@ -184,7 +184,7 @@ export default function Dashboard() {
                     {notificationsEnabled ? 'Reminders On' : 'Get Reminders'}
                 </h4>
                 <p className="text-sm text-slate-700 font-medium mt-1 leading-snug">
-                    {notificationsEnabled ? 'Tap to test' : 'Stay on track'}
+                    {notificationsEnabled ? 'Active' : 'Stay on track'}
                 </p>
             </div>
 
