@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { FadeIn, SlideIn } from '../../ui/animations'
-import { BookOpen, User, Star, ChevronRight, Activity as ActivityIcon } from 'lucide-react'
+import { BookOpen, User, Star, ChevronRight, Activity as ActivityIcon, Sparkles } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useProgress } from '../../context/ProgressContext'
 import ConceptLibrary from './ConceptLibrary'
 import ActivityFinder from './ActivityFinder'
 import SignOutModal from '../auth/SignOutModal'
+import { getDailyWisdom } from './wisdom'
 
 export default function Dashboard() {
   const { user, signInWithGoogle, signOut } = useAuth()
@@ -13,6 +14,8 @@ export default function Dashboard() {
   const [view, setView] = useState<'home' | 'library' | 'history'>('home')
   const [showActivityFinder, setShowActivityFinder] = useState(false)
   const [showSignOut, setShowSignOut] = useState(false)
+  
+  const dailyWisdom = useMemo(() => getDailyWisdom(), [])
   
   // Get first name if available, otherwise "Safe Parent"
   const displayName = user?.user_metadata?.full_name?.split(' ')[0] || 'Parent'
@@ -123,18 +126,16 @@ export default function Dashboard() {
             
             <div className="relative z-10">
                 <div className="flex items-center space-x-2 text-white mb-4">
-                    <Star size={18} fill="currentColor" className="text-yellow-400" />
+                    <Sparkles size={18} fill="currentColor" className="text-yellow-400" />
                     <span className="text-xs font-black uppercase tracking-widest text-white/90">Daily Wisdom</span>
                 </div>
-                <h2 className="text-2xl font-black leading-tight mb-4 text-white drop-shadow-md">
-                    "Silence is an instruction, not a punishment."
+                <h2 className="text-2xl font-black leading-tight mb-4 text-white drop-shadow-md font-serif italic">
+                    "{dailyWisdom.text}"
                 </h2>
                 <p className="text-white text-base mb-6 leading-relaxed font-bold opacity-90">
-                    When we stop talking, we stop adding fuel to the fire. Silence creates a vacuum that calm can fill.
+                    — {dailyWisdom.author}
                 </p>
-                <button className="text-sm font-extrabold text-white border-b-2 border-white pb-0.5 hover:opacity-80 transition-opacity">
-                    Read more
-                </button>
+                <div className="h-1 w-12 bg-indigo-500 rounded-full"></div>
             </div>
         </div>
       </SlideIn>
