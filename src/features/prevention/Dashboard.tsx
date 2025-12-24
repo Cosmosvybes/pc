@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect } from 'react'
 import { FadeIn, SlideIn } from '../../ui/animations'
-import { BookOpen, User, ChevronRight, Activity as ActivityIcon, Sparkles, Flame, Bell } from 'lucide-react'
+import { BookOpen, User, ChevronRight, Activity as ActivityIcon, Sparkles, Flame, Bell, Headphones } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useProgress } from '../../context/ProgressContext'
+import { useSubscription } from '../../context/SubscriptionContext'
 import ConceptLibrary from './ConceptLibrary'
 import ActivityFinder from './ActivityFinder'
+import AudioVault from './AudioVault'
 import SignOutModal from '../auth/SignOutModal'
 import { getDailyWisdom } from './wisdom'
 import { registerServiceWorker, requestNotificationPermission, sendTestNotification } from '../../lib/notifications'
@@ -12,7 +14,8 @@ import { registerServiceWorker, requestNotificationPermission, sendTestNotificat
 export default function Dashboard() {
   const { user, signInWithGoogle, signOut } = useAuth()
   const { history, streak } = useProgress()
-  const [view, setView] = useState<'home' | 'library' | 'history'>('home')
+  const { isPro, trialDaysLeft } = useSubscription()
+  const [view, setView] = useState<'home' | 'library' | 'history' | 'vault'>('home')
   const [showActivityFinder, setShowActivityFinder] = useState(false)
   const [showSignOut, setShowSignOut] = useState(false)
   const [notificationsEnabled, setNotificationsEnabled] = useState(Notification.permission === 'granted')
@@ -43,7 +46,13 @@ export default function Dashboard() {
         return <ActivityFinder onClose={() => setShowActivityFinder(false)} />
     }
     
-    // ... View Logic for Library/History (unchanged) works because we return early
+    if (view === 'vault') {
+        return (
+            <div className="w-full max-w-md mx-auto h-full px-6 pt-4">
+                <AudioVault onBack={() => setView('home')} />
+            </div>
+        )
+    }
 
   if (view === 'library') {
       return (
@@ -95,9 +104,21 @@ export default function Dashboard() {
       <FadeIn className="mb-8">
         <div className="flex justify-between items-center bg-white/90 backdrop-blur-xl border border-slate-200 p-6 rounded-3xl shadow-lg">
             <div>
-               <p className="text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1">
-                 {user ? 'Good Morning,' : 'Welcome'}
-               </p>
+               <div className="flex items-center space-x-2 mb-1">
+                   <p className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">
+                     {user ? 'Good Morning,' : 'Welcome'}
+                   </p>
+                   {isPro && trialDaysLeft > 0 && (
+                       <span className="bg-orange-100 text-orange-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                           {trialDaysLeft} Days Left
+                       </span>
+                   )}
+                   {isPro && trialDaysLeft === 0 && (
+                       <span className="bg-indigo-100 text-indigo-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                           PRO
+                       </span>
+                   )}
+               </div>
                <h1 className="text-3xl font-black text-black tracking-tight">
                  {user ? displayName : 'Certainty starts here.'}
                </h1>
@@ -160,6 +181,26 @@ export default function Dashboard() {
         <h3 className="text-xl font-bold text-certainty-dark mb-5">Your Tools</h3>
         <div className="grid grid-cols-2 gap-4">
             
+            {/* Audio Vault */}
+            <div 
+                onClick={() => setView('vault')}
+                className="col-span-2 bg-slate-900 text-white border border-slate-700 shadow-xl p-6 rounded-2xl hover:scale-[1.02] transition-transform cursor-pointer group relative overflow-hidden"
+            >
+                <div className="absolute top-0 right-0 -mt-2 -mr-2 bg-white/10 w-24 h-24 rounded-full blur-2xl"></div>
+                <div className="flex items-center justify-between mb-2 relative z-10">
+                    <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center text-white">
+                        <Headphones size={24} />
+                    </div>
+                    {isPro && trialDaysLeft > 0 ? (
+                         <span className="text-xs font-bold bg-orange-500 text-white px-2 py-1 rounded-full uppercase tracking-wider">Free Trial</span>
+                    ) : (
+                        <span className="text-xs font-bold bg-indigo-500 text-white px-2 py-1 rounded-full uppercase tracking-wider">Premium</span>
+                    )}
+                </div>
+                 <h4 className="text-lg font-bold text-white relative z-10">Audio Vault</h4>
+                 <p className="text-sm text-slate-300 font-medium relative z-10">Regulation station & soundscapes.</p>
+            </div>
+
             {/* Calm Streak (Existing) */}
             <div className="bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-6 rounded-2xl hover:scale-[1.02] transition-transform cursor-pointer group">
                  <div className="h-12 w-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors">

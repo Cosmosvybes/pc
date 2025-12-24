@@ -3,14 +3,22 @@ import { Check, Sparkles } from 'lucide-react'
 import { useSubscription } from '../../context/SubscriptionContext'
 import { FadeIn } from '../../ui/animations'
 
+// 👇 PASTE YOUR LEMON SQUEEZY LINK HERE WHEN VERIFIED
+const LEMON_SQUEEZY_URL = ""; 
+
 export default function Paywall() {
   const { signInWithGoogle, user } = useAuth()
   const { upgradeToPro } = useSubscription()
 
   const handleUpgrade = () => {
-    // In a real app, this would open Lemon Squeezy Checkout
-    // For now, we simulate success
-    const confirmed = window.confirm("Simulating Lemon Squeezy Checkout...\n\nClick OK to complete purchase.")
+    // 1. If you have the link, we go to Lemon Squeezy
+    if (LEMON_SQUEEZY_URL) {
+        window.location.href = LEMON_SQUEEZY_URL;
+        return;
+    }
+
+    // 2. Otherwise, we simulate for testing
+    const confirmed = window.confirm("LEMON SQUEEZY NOT CONFIGURED YET.\n\nSimulate a successful purchase for testing?")
     if (confirmed) {
         upgradeToPro()
     }
@@ -68,7 +76,7 @@ export default function Paywall() {
             )}
             
             <p className="text-xs text-slate-400 font-medium">
-                3 days free, then $9.99/month. <br/> Cancel anytime.
+                $9.99/month. Cancel anytime.
             </p>
         </div>
       </FadeIn>
