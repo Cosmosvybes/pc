@@ -1,19 +1,25 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { FadeIn, SlideIn } from '../../ui/animations'
-import { BookOpen, User, Star, ChevronRight, Activity as ActivityIcon, Sparkles } from 'lucide-react'
+import { BookOpen, User, ChevronRight, Activity as ActivityIcon, Sparkles, Flame, Bell } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useProgress } from '../../context/ProgressContext'
 import ConceptLibrary from './ConceptLibrary'
 import ActivityFinder from './ActivityFinder'
 import SignOutModal from '../auth/SignOutModal'
 import { getDailyWisdom } from './wisdom'
+import { registerServiceWorker, requestNotificationPermission, sendTestNotification } from '../../lib/notifications'
 
 export default function Dashboard() {
   const { user, signInWithGoogle, signOut } = useAuth()
-  const { totalCrises, history } = useProgress()
+  const { history, streak } = useProgress()
   const [view, setView] = useState<'home' | 'library' | 'history'>('home')
   const [showActivityFinder, setShowActivityFinder] = useState(false)
   const [showSignOut, setShowSignOut] = useState(false)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(Notification.permission === 'granted')
+
+  useEffect(() => {
+      registerServiceWorker();
+  }, [])
   
   const dailyWisdom = useMemo(() => getDailyWisdom(), [])
   
@@ -25,9 +31,19 @@ export default function Dashboard() {
     setShowSignOut(false)
   }
 
+  const handleEnableNotifications = async () => {
+      const granted = await requestNotificationPermission();
+      setNotificationsEnabled(granted);
+      if (granted) {
+          sendTestNotification();
+      }
+  }
+
     if (showActivityFinder) {
         return <ActivityFinder onClose={() => setShowActivityFinder(false)} />
     }
+    
+    // ... View Logic for Library/History (unchanged) works because we return early
 
   if (view === 'library') {
       return (
@@ -75,7 +91,7 @@ export default function Dashboard() {
           />
       )}
       
-      {/* Header - Now in a distinct container */}
+      {/* Header */}
       <FadeIn className="mb-8">
         <div className="flex justify-between items-center bg-white/90 backdrop-blur-xl border border-slate-200 p-6 rounded-3xl shadow-lg">
             <div>
@@ -104,7 +120,7 @@ export default function Dashboard() {
                   onClick={signInWithGoogle}
                   className="bg-white text-slate-700 px-4 py-2.5 rounded-full font-bold border border-slate-300 shadow-sm hover:shadow-md hover:bg-slate-50 transition-all flex items-center space-x-3"
                 >
-                    {/* Google G Logo */}
+                    {/* Google Icon */}
                     <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -117,10 +133,9 @@ export default function Dashboard() {
         </div>
       </FadeIn>
 
-      {/* Daily Wisdom Card - Hero */}
+      {/* Daily Wisdom Card */}
       <SlideIn className="mb-8">
         <div className="relative overflow-hidden rounded-3xl bg-slate-900 text-white shadow-2xl shadow-slate-900/40 p-8 border border-slate-800">
-            {/* Darker, richer gradients that don't wash out the black */}
             <div className="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-indigo-500/10 blur-3xl"></div>
             <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-32 w-32 rounded-full bg-blue-600/20 blur-3xl"></div>
             
@@ -144,7 +159,36 @@ export default function Dashboard() {
       <SlideIn className="">
         <h3 className="text-xl font-bold text-certainty-dark mb-5">Your Tools</h3>
         <div className="grid grid-cols-2 gap-4">
-            {/* New card for Activity Finder */}
+            
+            {/* Calm Streak (Existing) */}
+            <div className="bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-6 rounded-2xl hover:scale-[1.02] transition-transform cursor-pointer group">
+                 <div className="h-12 w-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                    <Flame size={24} />
+                </div>
+                <h4 className="text-lg font-bold text-certainty-dark">Calm Streak</h4>
+                <div className="flex items-baseline space-x-1 mt-1">
+                    <span className="text-2xl font-black text-rose-600">{streak}</span>
+                    <span className="text-sm text-slate-700 font-medium">days</span>
+                </div>
+            </div>
+
+            {/* Notification Toggle (New) */}
+            <div 
+                onClick={handleEnableNotifications}
+                className={`bg-white/95 backdrop-blur-xl border-2 ${notificationsEnabled ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200'} shadow-xl p-6 rounded-2xl hover:scale-[1.02] transition-transform cursor-pointer group`}
+            >
+                <div className={`h-12 w-12 rounded-full flex items-center justify-center mb-4 transition-colors ${notificationsEnabled ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white'}`}>
+                    <Bell size={24} />
+                </div>
+                <h4 className="text-lg font-bold text-certainty-dark">
+                    {notificationsEnabled ? 'Reminders On' : 'Get Reminders'}
+                </h4>
+                <p className="text-sm text-slate-700 font-medium mt-1 leading-snug">
+                    {notificationsEnabled ? 'Tap to test' : 'Stay on track'}
+                </p>
+            </div>
+
+            {/* Activity Finder */}
             <div 
                 onClick={() => setShowActivityFinder(true)}
                 className="bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-6 rounded-2xl hover:scale-[1.02] transition-transform cursor-pointer group"
@@ -156,6 +200,7 @@ export default function Dashboard() {
                 <p className="text-sm text-slate-700 font-medium mt-1 leading-snug">Boredom busters</p>
             </div>
 
+            {/* Library */}
             <div 
                 onClick={() => setView('library')}
                 className="bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-6 rounded-2xl hover:scale-[1.02] transition-transform cursor-pointer group"
@@ -164,15 +209,7 @@ export default function Dashboard() {
                     <BookOpen size={24} />
                 </div>
                 <h4 className="text-lg font-bold text-certainty-dark">Concept Library</h4>
-                <p className="text-sm text-slate-700 font-medium mt-1 leading-snug">Deep dives into the method</p>
-            </div>
-
-            <div className="bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-6 rounded-2xl hover:scale-[1.02] transition-transform cursor-pointer group">
-                 <div className="h-12 w-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors">
-                    <Star size={24} />
-                </div>
-                <h4 className="text-lg font-bold text-certainty-dark">My Progress</h4>
-                <p className="text-sm text-slate-700 font-medium mt-1 leading-snug">{totalCrises} Crises handled</p>
+                <p className="text-sm text-slate-700 font-medium mt-1 leading-snug">Deep dives</p>
             </div>
         </div>
       </SlideIn>

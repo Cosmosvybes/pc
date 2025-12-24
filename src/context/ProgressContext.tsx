@@ -12,6 +12,7 @@ export interface CrisisRecord {
 interface ProgressContextType {
   history: CrisisRecord[];
   totalCrises: number;
+  streak: number;
   addCrisis: (record: Omit<CrisisRecord, 'id' | 'date'>) => void;
   clearHistory: () => void;
 }
@@ -49,10 +50,16 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
   const clearHistory = () => setHistory([])
 
+  // Calculate Streak (Days since last crisis)
+  const streak = history.length > 0 
+    ? Math.floor((new Date().getTime() - new Date(history[0].date).getTime()) / (1000 * 60 * 60 * 24))
+    : 0
+
   return (
     <ProgressContext.Provider value={{
       history,
       totalCrises: history.length,
+      streak,
       addCrisis,
       clearHistory
     }}>
