@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+:root {
+  --color-relief-white: #FAFAF9;
+  --color-certainty-blue: #0284C7;
+  --color-certainty-blue-light: #E0F2FE;
+  --color-certainty-blue-dark: #0369A1;
+  --color-validation-gold: #F59E0B;
+  --color-certainty-dark: #0F172A;
+  --color-urgent-red: #E11D48;
+}
+
+body {
+  background-color: var(--color-relief-white);
+  background-image:
+    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 0) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 0) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 0) 0, transparent 50%);
+  color: var(--color-certainty-dark);
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

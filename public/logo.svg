@@ -1,0 +1,22 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="calmGradient" x1="256" y1="0" x2="256" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4F46E5" /> <!-- Indigo 600 -->
+      <stop offset="1" stop-color="#818CF8" /> <!-- Indigo 400 -->
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="15" flood-color="#4338ca" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <rect width="512" height="512" rx="120" fill="white"/>
+  
+  <!-- Outer Protective Circle -->
+  <circle cx="256" cy="256" r="160" stroke="url(#calmGradient)" stroke-width="40" filter="url(#softShadow)" opacity="0.9"/>
+  
+  <!-- Inner Child Circle -->
+  <circle cx="256" cy="256" r="60" fill="url(#calmGradient)" />
+
+  <!-- Connecting 'Bridge' (Connection before correction) -->
+  <path d="M256 196 L256 256" stroke="url(#calmGradient)" stroke-width="20" stroke-linecap="round" />
+</svg>
