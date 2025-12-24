@@ -32,7 +32,7 @@ export default function Paywall() {
 
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-lg mb-8 text-left max-w-sm w-full">
             <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
-                QuietKid Pro
+                ParentingCertainty Pro
             </h3>
             <ul className="space-y-4">
                 {[

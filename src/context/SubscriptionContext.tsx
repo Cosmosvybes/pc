@@ -17,19 +17,19 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check local storage or Supabase for subscription status
     // For now, we simulate a check
-    const status = localStorage.getItem('quietkid_pro_status')
+    const status = localStorage.getItem('pc_pro_status')
     setIsPro(status === 'active')
     setIsLoading(false)
   }, [])
 
   const upgradeToPro = () => {
     setIsPro(true)
-    localStorage.setItem('quietkid_pro_status', 'active')
+    localStorage.setItem('pc_pro_status', 'active')
   }
 
   const downgradeToFree = () => {
     setIsPro(false)
-    localStorage.removeItem('quietkid_pro_status')
+    localStorage.removeItem('pc_pro_status')
   }
 
   return (

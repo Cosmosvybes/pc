@@ -23,7 +23,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
   // Load from local storage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('quietkid_progress')
+    const saved = localStorage.getItem('pc_progress')
     if (saved) {
       try {
         setHistory(JSON.parse(saved))
@@ -35,7 +35,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
   // Save to local storage whenever history changes
   useEffect(() => {
-    localStorage.setItem('quietkid_progress', JSON.stringify(history))
+    localStorage.setItem('pc_progress', JSON.stringify(history))
   }, [history])
 
   const addCrisis = (record: Omit<CrisisRecord, 'id' | 'date'>) => {

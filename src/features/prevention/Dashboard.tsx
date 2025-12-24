@@ -77,7 +77,7 @@ export default function Dashboard() {
         <div className="flex justify-between items-center bg-white/90 backdrop-blur-xl border border-slate-200 p-6 rounded-3xl shadow-lg">
             <div>
                <p className="text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-1">
-                 {user ? 'Good Morning,' : 'Welcome to QuietKid'}
+                 {user ? 'Good Morning,' : 'Welcome'}
                </p>
                <h1 className="text-3xl font-black text-black tracking-tight">
                  {user ? displayName : 'Certainty starts here.'}

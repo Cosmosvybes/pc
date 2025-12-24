@@ -1,9 +1,8 @@
-# ParentingCertainty (formerly QuietKid)
+# ParentingCertainty
 
 An AI-powered "Psychological First Aid" application for parents. This PWA provides instant, clinically-grounded scripts for crises and regulatory activities for prevention.
 
 ## Features
-
 ### Crisis Mode
 - **Instant Scripts**: Choose an Age + Situation (e.g., "6yo Bedtime") to get an exact "Say/Do/Avoid" script.
 - **AI Intelligence**: Uses Google Gemini to dynamically generate unique scripts for complex situations.

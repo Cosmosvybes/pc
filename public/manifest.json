@@ -1,6 +1,6 @@
 {
-  "name": "QuietKid - Parenting Certainty",
-  "short_name": "QuietKid",
+  "name": "ParentingCertainty",
+  "short_name": "ParentingCertainty",
   "description": "Instant guidance for parenting chaos.",
   "start_url": "/",
   "display": "standalone",
