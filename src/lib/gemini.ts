@@ -9,20 +9,32 @@ if (!apiKey) {
 }
 
 const genAI = new GoogleGenerativeAI(apiKey || "PLACEHOLDER");
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function generateCrisisScript(age: AgeGroup, situation: Situation): Promise<Prescription> {
     if (!apiKey) {
         throw new Error("AI Service Unavailable: Missing API Key");
     }
 
-    const prompt = `
+        const approaches = [
+            "Clinical Focus: Somatic/Sensory Regulation (Focus on body/calm)",
+            "Clinical Focus: Radical Validation (Focus on naming the emotion)",
+            "Clinical Focus: Firm Boundaries (Focus on safety and clear rules)",
+            "Clinical Focus: Playful/Unexpected (Focus on breaking the tension - if appropriate)",
+            "Clinical Focus: Connection First (Focus on touch and presence)"
+        ];
+        const randomApproach = approaches[Math.floor(Math.random() * approaches.length)];
+
+        const prompt = `
         You are an expert child psychologist and "Psychological First Aid" responder.
         
         Generate a specific, calming, and authoritative script for a parent handling a crisis.
         
         Child Age: ${age}
         Situation: ${situation}
+        ${randomApproach}
+        
+        CRITICAL INSTRUCTION: Avoid generic phrases like "I see you are upset". Be unique, specific, and actionable based on the Clinical Focus above.
         
         Return ONLY a raw JSON object with these 3 keys. Do not include markdown formatting or code blocks.
         
@@ -42,9 +54,15 @@ export async function generateCrisisScript(age: AgeGroup, situation: Situation):
         const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
         
         return JSON.parse(cleanText) as Prescription;
-    } catch (error) {
+    } catch (error: any) {
         console.error("Gemini Generation Error:", error);
-        throw new Error("Failed to generate advice. Please use offline mode.");
+        
+        // Specific help for 404 (Model Not Found) - usually means API not enabled or region blocked
+        if (error.message.includes("404") || error.message.includes("not found")) {
+             throw new Error("AI Error: Model not found. Please enable 'Generative Language API' in Google AI Studio.");
+        }
+        
+        throw new Error(`AI Error: ${error.message || "Unknown error"}`);
     }
 }
 
