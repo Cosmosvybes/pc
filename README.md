@@ -1,4 +1,4 @@
-# ParentingCertainty (formerly QuietKid)
+# ParentingCertainty
 
 An AI-powered "Psychological First Aid" application for parents. This PWA provides instant, clinically-grounded scripts for crises and regulatory activities for prevention.
 
