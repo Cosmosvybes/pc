@@ -68,7 +68,7 @@ export default function Paywall() {
             )}
             
             <p className="text-xs text-slate-400 font-medium">
-                7 days free, then ₦5,000/month. <br/> Cancel anytime.
+                3 days free, then $9.99/month. <br/> Cancel anytime.
             </p>
         </div>
       </FadeIn>
