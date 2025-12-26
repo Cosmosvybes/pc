@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { FadeIn, SlideIn } from '../../ui/animations'
 import { BookOpen, User, ChevronRight, Activity as ActivityIcon, Sparkles, Flame, Bell, Headphones, ArrowRight } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
@@ -95,7 +96,7 @@ export default function Dashboard({ onPanic }: Props) {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto h-full flex flex-col pt-8 pb-24 px-6 overflow-y-auto hide-scrollbar">
+    <div className="w-full max-w-md mx-auto h-full flex flex-col pt-8 pb-40 px-6 overflow-y-auto hide-scrollbar">
       
       {showSignOut && (
           <SignOutModal 
@@ -307,6 +308,13 @@ export default function Dashboard({ onPanic }: Props) {
                 </div>
             )}
        </FadeIn>
+
+       {/* Legal Footer */}
+       <div className="mt-12 mb-4 flex justify-center space-x-6 text-xs font-bold text-slate-300">
+          <Link to="/terms" className="hover:text-slate-400 transition-colors">Terms of Service</Link>
+          <Link to="/privacy" className="hover:text-slate-400 transition-colors">Privacy Policy</Link>
+          <Link to="/refund" className="hover:text-slate-400 transition-colors">Refund Policy</Link>
+       </div>
 
     </div>
   )
