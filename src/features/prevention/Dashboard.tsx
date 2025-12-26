@@ -1,12 +1,11 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FadeIn, SlideIn } from '../../ui/animations'
-import { BookOpen, User, ChevronRight, Activity as ActivityIcon, Sparkles, Flame, Bell, Headphones, ArrowRight } from 'lucide-react'
+import { BookOpen, User, ChevronRight, Sparkles, Flame, Bell, Headphones, ArrowRight } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useProgress } from '../../context/ProgressContext'
 import { useSubscription } from '../../context/SubscriptionContext'
 import ConceptLibrary from './ConceptLibrary'
-import ActivityFinder from './ActivityFinder'
 import AudioVault from './AudioVault'
 import SignOutModal from '../auth/SignOutModal'
 import { getDailyWisdom } from './wisdom'
@@ -21,7 +20,6 @@ export default function Dashboard({ onPanic }: Props) {
   const { history, streak } = useProgress()
   const { isPro, trialDaysLeft } = useSubscription()
   const [view, setView] = useState<'home' | 'library' | 'history' | 'vault'>('home')
-  const [showActivityFinder, setShowActivityFinder] = useState(false)
   const [showSignOut, setShowSignOut] = useState(false)
   const [notificationsEnabled, setNotificationsEnabled] = useState(Notification.permission === 'granted')
 
@@ -47,9 +45,7 @@ export default function Dashboard({ onPanic }: Props) {
       }
   }
 
-    if (showActivityFinder) {
-        return <ActivityFinder onClose={() => setShowActivityFinder(false)} />
-    }
+
     
     if (view === 'vault') {
         return (
@@ -252,17 +248,7 @@ export default function Dashboard({ onPanic }: Props) {
                 </p>
             </div>
 
-            {/* Activity Finder */}
-            <div 
-                onClick={() => setShowActivityFinder(true)}
-                className="bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-6 rounded-2xl hover:scale-[1.02] transition-transform cursor-pointer group"
-            >
-                <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 mb-4 group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                    <ActivityIcon size={24} />
-                </div>
-                <h4 className="text-lg font-bold text-certainty-dark">Find Activity</h4>
-                <p className="text-sm text-slate-700 font-medium mt-1 leading-snug">Boredom busters</p>
-            </div>
+
 
             {/* Library */}
             <div 
@@ -314,6 +300,7 @@ export default function Dashboard({ onPanic }: Props) {
           <Link to="/terms" className="hover:text-slate-400 transition-colors">Terms of Service</Link>
           <Link to="/privacy" className="hover:text-slate-400 transition-colors">Privacy Policy</Link>
           <Link to="/refund" className="hover:text-slate-400 transition-colors">Refund Policy</Link>
+          <Link to="/pricing" className="hover:text-slate-400 transition-colors">Pricing</Link>
        </div>
 
     </div>

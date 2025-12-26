@@ -6,7 +6,7 @@ export default function Terms() {
       <p>Last updated: {new Date().toLocaleDateString()}</p>
 
       <h3>1. Introduction</h3>
-      <p>Welcome to ParentingCertainty ("we," "our," or "us"). By accessing or using our application "QuietKid" (the "Service"), you agree to be bound by these Terms of Service.</p>
+      <p>Welcome to Parenting Certainty ("we," "our," or "us"). By accessing or using our application (the "Service"), you agree to be bound by these Terms of Service.</p>
 
       <h3>2. Subscription and Payments</h3>
       <p>We offer a paid subscription service ("Pro Access"). Billing is handled by our merchant of record, Paddle. By subscribing, you agree to Paddle's taxes and fees as applicable in your region.</p>
@@ -18,7 +18,7 @@ export default function Terms() {
       <p>You are responsible for safeguarding the credentials you use to access the Service. You agree not to disclose your password to any third party.</p>
 
       <h3>5. Limitation of Liability</h3>
-      <p>In no event shall ParentingCertainty, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
+      <p>In no event shall Parenting Certainty, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
 
       <h3>6. Changes</h3>
       <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time.</p>
