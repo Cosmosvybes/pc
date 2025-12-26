@@ -2,9 +2,6 @@ import { useState } from 'react'
 import { ShieldAlert } from 'lucide-react'
 import CrisisMode from './features/crisis/CrisisMode'
 import Dashboard from './features/prevention/Dashboard'
-import { AuthProvider } from './context/AuthContext'
-import { ProgressProvider } from './context/ProgressContext'
-import { SubscriptionProvider } from './context/SubscriptionContext'
 
 function AppContent() {
   const [isCrisis, setIsCrisis] = useState(false)
@@ -45,15 +42,7 @@ function AppContent() {
 }
 
 function App() {
-  return (
-    <AuthProvider>
-      <ProgressProvider>
-        <SubscriptionProvider>
-           <AppContent />
-        </SubscriptionProvider>
-      </ProgressProvider>
-    </AuthProvider>
-  )
+  return <AppContent />
 }
 
 export default App
