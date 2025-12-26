@@ -19,7 +19,7 @@ function AppContent() {
       ) : (
         <>
             <div className="h-full w-full relative z-0">
-               <Dashboard />
+               <Dashboard onPanic={triggerCrisis} />
               
               {/* Bottom Floating Navigation for "Okay" Mode */}
               <div className="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto z-50">

@@ -9,7 +9,14 @@ if (!apiKey) {
 }
 
 const genAI = new GoogleGenerativeAI(apiKey || "PLACEHOLDER");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+    generationConfig: {
+        temperature: 0.9, // High creativity
+        topK: 40,
+        topP: 0.95,
+    }
+});
 
 export async function generateCrisisScript(age: AgeGroup, situation: Situation): Promise<Prescription> {
     if (!apiKey) {
@@ -20,10 +27,38 @@ export async function generateCrisisScript(age: AgeGroup, situation: Situation):
             "Clinical Focus: Somatic/Sensory Regulation (Focus on body/calm)",
             "Clinical Focus: Radical Validation (Focus on naming the emotion)",
             "Clinical Focus: Firm Boundaries (Focus on safety and clear rules)",
-            "Clinical Focus: Playful/Unexpected (Focus on breaking the tension - if appropriate)",
-            "Clinical Focus: Connection First (Focus on touch and presence)"
+            "Clinical Focus: Playful/Unexpected (Focus on breaking the tension)",
+            "Clinical Focus: Connection First (Focus on touch and presence)",
+            "Clinical Focus: The 'Whisper' Method (Lower volume to force attention)",
+            "Clinical Focus: 'Sportscaster' Mode (Narrate what is happening without judgment)",
+            "Clinical Focus: The 'Yes' Sandwich (Yes, Limit, Yes)",
+            "Clinical Focus: Physical Redirection (Move the body to change the mind)",
+            "Clinical Focus: The 'Pause' Button (Model taking a deep breath first)",
+            "Clinical Focus: Humor/Silliness (If safe: Do something absurd)",
+            "Clinical Focus: Choice Giving (Give 2 acceptable choices)",
+            "Clinical Focus: 'I Wonder' Curiosity (Wonder why they are doing it)",
+            "Clinical Focus: Animal Style (Act like a slow turtle or sleeping lion)",
+            "Clinical Focus: Minimalist (Say as few words as possible)",
+            "Clinical Focus: Partner-In-Crime (We are on the same team vs the problem)",
+            "Clinical Focus: The Broken Record (Calmly repeat the boundary)",
+            "Clinical Focus: Gross Motor (Stomp it out / Shake it out)",
+            "Clinical Focus: Future Casting (Talk about what we will do AFTER)",
+            "Clinical Focus: Empathy Guessing (Guess what they are feeling)"
         ];
+        
+        const twists = [
+            "Context: You are in a public place (Grocery Store/Park).",
+            "Context: You are exhausted and have low energy.",
+            "Context: You are in a rush to leave.",
+            "Context: It is bedtime and everyone is tired.",
+            "Context: Siblings are watching.",
+            "Context: Keep it extremely brief (Under 10 words).",
+            "Context: Use a metaphor.",
+            "Context: Focus on non-verbal cues."
+        ];
+
         const randomApproach = approaches[Math.floor(Math.random() * approaches.length)];
+        const randomTwist = Math.random() > 0.5 ? twists[Math.floor(Math.random() * twists.length)] : ""; // 50% chance of a twist
 
         const prompt = `
         You are an expert child psychologist and "Psychological First Aid" responder.
@@ -33,6 +68,7 @@ export async function generateCrisisScript(age: AgeGroup, situation: Situation):
         Child Age: ${age}
         Situation: ${situation}
         ${randomApproach}
+        ${randomTwist}
         
         CRITICAL INSTRUCTION: Avoid generic phrases like "I see you are upset". Be unique, specific, and actionable based on the Clinical Focus above.
         

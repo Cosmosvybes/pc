@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { FadeIn, SlideIn } from '../../ui/animations'
-import { BookOpen, User, ChevronRight, Activity as ActivityIcon, Sparkles, Flame, Bell, Headphones } from 'lucide-react'
+import { BookOpen, User, ChevronRight, Activity as ActivityIcon, Sparkles, Flame, Bell, Headphones, ArrowRight } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useProgress } from '../../context/ProgressContext'
 import { useSubscription } from '../../context/SubscriptionContext'
@@ -11,7 +11,11 @@ import SignOutModal from '../auth/SignOutModal'
 import { getDailyWisdom } from './wisdom'
 import { registerServiceWorker, requestNotificationPermission, sendTestNotification } from '../../lib/notifications'
 
-export default function Dashboard() {
+interface Props {
+  onPanic: () => void;
+}
+
+export default function Dashboard({ onPanic }: Props) {
   const { user, signInWithGoogle, signOut } = useAuth()
   const { history, streak } = useProgress()
   const { isPro, trialDaysLeft } = useSubscription()
@@ -179,6 +183,24 @@ export default function Dashboard() {
       {/* Quick Actions / Modules */}
       <SlideIn className="">
         <h3 className="text-xl font-bold text-certainty-dark mb-5">Your Tools</h3>
+        
+        {/* PANIC BUTTON (New) */}
+        <button 
+          onClick={onPanic}
+          className="mb-8 w-full bg-rose-500 hover:bg-rose-600 active:scale-[0.98] transition-all text-white p-6 rounded-3xl shadow-xl shadow-rose-200 flex items-center justify-between group overflow-hidden relative"
+        >
+            <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+            <div className="flex flex-col items-start relative z-10">
+                <span className="text-3xl font-black tracking-tight flex items-center gap-2">
+                     HELP ME NOW <span className="animate-pulse">🚨</span>
+                </span>
+                <span className="text-rose-100 font-medium text-sm mt-1">Tantrum • Panic • Overwhelmed</span>
+            </div>
+            <div className="bg-white/20 p-3 rounded-full">
+                <ArrowRight size={32} className="text-white" />
+            </div>
+        </button>
+
         <div className="grid grid-cols-2 gap-4">
             
             {/* Audio Vault */}
