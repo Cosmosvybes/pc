@@ -261,6 +261,18 @@ export default function Dashboard({ onPanic }: Props) {
                 <h4 className="text-lg font-bold text-certainty-dark">Concept Library</h4>
                 <p className="text-sm text-slate-700 font-medium mt-1 leading-snug">Deep dives</p>
             </div>
+
+            {/* Shop Module */}
+            <Link 
+                to="/shop"
+                className="bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl p-6 rounded-2xl hover:scale-[1.02] transition-transform cursor-pointer group"
+            >
+                <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <span className="font-bold text-xl">$</span>
+                </div>
+                <h4 className="text-lg font-bold text-certainty-dark">Resource Shop</h4>
+                <p className="text-sm text-slate-700 font-medium mt-1 leading-snug">Tools & Scripts</p>
+            </Link>
         </div>
       </SlideIn>
 
@@ -294,6 +306,8 @@ export default function Dashboard({ onPanic }: Props) {
                 </div>
             )}
        </FadeIn>
+
+
 
        {/* Legal Footer */}
        <div className="mt-12 mb-4 flex justify-center space-x-6 text-xs font-bold text-slate-300">

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { ArrowLeft, User, MapPin, Zap, Moon, AlertOctagon, Volume2 } from 'lucide-react'
 import { FadeIn, ScaleIn } from '../../ui/animations'
 import { CRISIS_SCRIPTS, type SituationType, type LocationType, type AgeType } from './static-data'
@@ -46,7 +47,7 @@ interface Props {
   onExit: () => void
 }
 
-type Step = 'selector' | 'context' | 'result'
+type Step = 'selector' | 'context' | 'regulation' | 'result' | 'reassurance'
 
 export default function CrisisMode({ onExit }: Props) {
   const [step, setStep] = useState<Step>('selector')
@@ -96,15 +97,19 @@ export default function CrisisMode({ onExit }: Props) {
 
   const handleGo = () => {
       if (!situation) return;
-      if (!isPro && situation !== 'meltdown') { return; } // Free trial only allows Meltdown potentially? (Actually keeping logic simple for now)
+      if (!isPro && situation !== 'meltdown') { return; } 
       
-      setStep('result')
-      
-      const script = CRISIS_SCRIPTS[situation][location][age];
-      startAudio(script.audio);
+      setStep('regulation') 
       
       // Log it
       addCrisis({ age, situation, durationSeconds: 0 });
+      
+      // Auto-advance to result after 4 seconds
+      setTimeout(() => {
+          setStep('result');
+          const script = CRISIS_SCRIPTS[situation][location][age];
+          startAudio(script.audio);
+      }, 4000);
   }
 
   // RENDERERS
@@ -200,27 +205,49 @@ export default function CrisisMode({ onExit }: Props) {
             </div>
         )}
 
+        {/* STEP 2.5: REGULATION */}
+        {step === 'regulation' && (
+            <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center px-8 text-center animate-in fade-in duration-500">
+                <div className="animate-pulse duration-[4000ms]">
+                    <h2 className="text-3xl font-black text-white mb-6 leading-tight">
+                        You’re not failing.
+                    </h2>
+                    <p className="text-slate-300 text-xl font-medium leading-relaxed">
+                        This moment is hard — <br/>and you’re handling it.
+                    </p>
+                </div>
+                <div className="mt-12 h-1 w-24 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-indigo-500 animate-[width_4s_ease-in-out_forwards]" style={{width: '0%'}}></div>
+                </div>
+            </div>
+        )}
+
         {/* STEP 3: RESULT */}
         {step === 'result' && situation && (
             <div className="flex-1 flex flex-col animate-in fade-in duration-700 bg-white">
                 {/* Audio Indicator */}
-                <div className="h-16 bg-slate-900 flex items-center justify-center gap-3">
-                    <Volume2 className="text-green-400 animate-pulse" size={24} />
-                    <span className="text-white font-mono text-sm tracking-widest uppercase">Audio Playing...</span>
+                <div className="h-14 bg-slate-900 flex items-center justify-center gap-3">
+                    <Volume2 className="text-green-400 animate-pulse" size={20} />
+                    <span className="text-white font-mono text-xs tracking-widest uppercase">Audio Playing...</span>
+                </div>
+                
+                {/* Reassurance Header */}
+                <div className="bg-indigo-50 px-6 py-4 border-b border-indigo-100 text-center">
+                    <p className="text-indigo-900 text-sm font-medium">Your child isn’t giving you a hard time — <br/><strong>they’re having a hard time.</strong></p>
                 </div>
 
-                <div className="flex-1 flex flex-col px-6 pt-12 pb-6 text-center">
+                <div className="flex-1 flex flex-col px-6 pt-8 pb-6 text-center">
                     <ScaleIn>
-                        <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-4">You Say:</h3>
-                        <p className="text-3xl font-black text-slate-800 leading-tight mb-12">
+                        <h3 className="text-slate-400 font-bold uppercase tracking-widest text-xs mb-3">Try Saying:</h3>
+                        <p className="text-2xl font-black text-slate-800 leading-snug mb-8">
                             "{CRISIS_SCRIPTS[situation][location][age].say}"
                         </p>
                     </ScaleIn>
 
                     <FadeIn>
-                        <div className="border-t-2 border-slate-100 py-8">
-                             <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-4">You Do:</h3>
-                             <p className="text-xl font-bold text-indigo-600">
+                        <div className="border-t-2 border-slate-100 py-6">
+                             <h3 className="text-slate-400 font-bold uppercase tracking-widest text-xs mb-3">Try Doing:</h3>
+                             <p className="text-lg font-bold text-indigo-600 leading-relaxed">
                                 {CRISIS_SCRIPTS[situation][location][age].action}
                              </p>
                         </div>
@@ -229,11 +256,40 @@ export default function CrisisMode({ onExit }: Props) {
                 
                 <div className="p-6 bg-slate-50 border-t border-slate-200">
                     <button 
-                        onClick={() => setStep('selector')}
+                        onClick={() => setStep('reassurance')}
                         className="w-full py-4 bg-white border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-100"
                     >
-                        Start Over
+                        I'm Okay Now
                     </button>
+                    <p className="text-center text-xs text-slate-300 font-bold mt-4 uppercase tracking-widest">Backup Plan Active</p>
+                </div>
+            </div>
+        )}
+
+        {/* STEP 4: REASSURANCE */}
+        {step === 'reassurance' && (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 animate-in fade-in duration-700 text-center">
+                <div className="mb-8 p-4 bg-indigo-50 rounded-full text-indigo-400">
+                    <User size={48} />
+                </div>
+                <h2 className="text-3xl font-black text-slate-800 mb-4">That was a hard moment.</h2>
+                <div className="space-y-2 mb-12">
+                     <p className="text-xl text-slate-600 font-medium">You stayed. You tried.</p>
+                     <p className="text-xl text-indigo-600 font-bold">That matters more than getting it perfect.</p>
+                </div>
+                
+                <button 
+                    onClick={onExit}
+                    className="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 shadow-xl"
+                >
+                    Return to Dashboard
+                </button>
+
+                <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
+                    <p className="text-slate-400 text-sm font-medium mb-3">Want to prevent this next time?</p>
+                    <Link to="/shop" className="text-indigo-500 font-bold text-sm border-b-2 border-indigo-100 hover:border-indigo-500 transition-all pb-0.5">
+                        Browse Prevention Tools
+                    </Link>
                 </div>
             </div>
         )}

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
+import { initPaddle } from '../lib/paddle';
 
 interface SubscriptionContextType {
   isPro: boolean;
@@ -17,11 +18,23 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [trialDaysLeft, setTrialDaysLeft] = useState<number>(0)
 
   useEffect(() => {
-    checkStatus()
+    // Initialize Paddle
+    const init = async () => {
+        await initPaddle((data) => {
+             // console.log("Paddle Event:", data);
+             if (data.name === 'checkout.completed') {
+                 setIsPro(true);
+                 localStorage.setItem('pc_pro_status', 'active');
+                 setTrialDaysLeft(0);
+             }
+        });
+    };
+    init();
+    checkStatus();
   }, [])
 
   const checkStatus = () => {
-    // 1. Check if actively subscribed (Manual override or Lemon Squeezy webhook in real app)
+    // 1. Check if actively subscribed (Manual override or Paddle in real app)
     const status = localStorage.getItem('pc_pro_status')
     if (status === 'active') {
         setIsPro(true)
@@ -55,16 +68,40 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     setIsLoading(false)
   }
 
-  const upgradeToPro = () => {
-    setIsPro(true)
-    localStorage.setItem('pc_pro_status', 'active')
-    setTrialDaysLeft(0)
+  const upgradeToPro = async () => {
+    const priceId = import.meta.env.VITE_PADDLE_PRICE_ID;
+    
+    if (!priceId || priceId.includes('placeholder')) {
+        alert("Paddle Integration Setup Required.\nPlease add VITE_PADDLE_PRICE_ID to .env.local");
+        return;
+    }
+
+    try {
+        const { getPaddle } = await import('../lib/paddle');
+        const paddle = getPaddle();
+        
+        if (paddle) {
+             // Event handling is now done via the global init listener or we rely on the redirect for safety
+             paddle.Checkout.open({
+                 items: [{ priceId: priceId, quantity: 1 }],
+                 settings: {
+                     successUrl: window.location.href, // Redirect might reload page, which is fine
+                     displayMode: 'overlay',
+                     theme: 'light',
+                     locale: 'en'
+                 }
+             });
+        } else {
+            console.error("Paddle not initialized");
+        }
+    } catch (e) {
+        console.error("Checkout Error:", e);
+    }
   }
 
   const downgradeToFree = () => {
     setIsPro(false)
     localStorage.removeItem('pc_pro_status')
-    // Reset trial for testing? No, trial is consumed.
   }
 
   return (

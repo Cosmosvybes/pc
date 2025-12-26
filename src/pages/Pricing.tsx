@@ -5,9 +5,10 @@ export default function Pricing() {
   return (
     <LegalLayout title="Pricing">
       <div className="text-center mb-12">
-        <p className="text-xl text-slate-600 mb-4">Simple, transparent pricing for peace of mind.</p>
+        <h2 className="text-2xl font-bold text-slate-900 mb-2">"Next time you won't be alone."</h2>
+        <p className="text-lg text-slate-500 mb-6">Your backup plan for the hard moments.</p>
         <div className="inline-block bg-white p-8 rounded-3xl shadow-xl border-2 border-indigo-100 relative overflow-hidden">
-            <div className="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">POPULAR</div>
+            <div className="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">BACKUP</div>
             <h2 className="text-2xl font-black text-slate-900 mb-2">Pro Access</h2>
             <div className="flex items-baseline justify-center space-x-1 mb-6">
                 <span className="text-4xl font-black text-indigo-600">$10</span>
