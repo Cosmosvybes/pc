@@ -3,25 +3,12 @@ import { Check, Sparkles } from 'lucide-react'
 import { useSubscription } from '../../context/SubscriptionContext'
 import { FadeIn } from '../../ui/animations'
 
-// 👇 PASTE YOUR LEMON SQUEEZY LINK HERE WHEN VERIFIED
-const LEMON_SQUEEZY_URL = ""; 
-
 export default function Paywall() {
   const { signInWithGoogle, user } = useAuth()
   const { upgradeToPro } = useSubscription()
 
   const handleUpgrade = () => {
-    // 1. If you have the link, we go to Lemon Squeezy
-    if (LEMON_SQUEEZY_URL) {
-        window.location.href = LEMON_SQUEEZY_URL;
-        return;
-    }
-
-    // 2. Otherwise, we simulate for testing
-    const confirmed = window.confirm("LEMON SQUEEZY NOT CONFIGURED YET.\n\nSimulate a successful purchase for testing?")
-    if (confirmed) {
-        upgradeToPro()
-    }
+    upgradeToPro()
   }
 
   return (
@@ -71,12 +58,12 @@ export default function Paywall() {
                     className="w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white py-4 rounded-xl font-black text-lg shadow-xl shadow-rose-500/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center relative overflow-hidden group"
                 >
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                    <span className="relative">Start Free Trial</span>
+                    <span className="relative">Start for $1</span>
                 </button>
             )}
             
             <p className="text-xs text-slate-400 font-medium">
-                $9.99/month. Cancel anytime.
+                First month $1, then $9.99/mo.
             </p>
         </div>
       </FadeIn>

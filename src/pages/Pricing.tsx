@@ -1,7 +1,10 @@
 import LegalLayout from './legal/LegalLayout';
 import { Check } from 'lucide-react';
+import { useSubscription } from '../context/SubscriptionContext';
 
 export default function Pricing() {
+  const { upgradeToPro } = useSubscription();
+
   return (
     <LegalLayout title="Pricing">
       <div className="text-center mb-12">
@@ -11,7 +14,7 @@ export default function Pricing() {
             <div className="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">BACKUP</div>
             <h2 className="text-2xl font-black text-slate-900 mb-2">Pro Access</h2>
             <div className="flex items-baseline justify-center space-x-1 mb-6">
-                <span className="text-4xl font-black text-indigo-600">$10</span>
+                <span className="text-4xl font-black text-indigo-600">$9.99</span>
                 <span className="text-slate-500 font-medium">/month</span>
             </div>
             
@@ -30,10 +33,13 @@ export default function Pricing() {
                 ))}
             </ul>
             
-            <button className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors">
-                Start 7-Day Free Trial
+            <button 
+                onClick={upgradeToPro}
+                className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors"
+            >
+                Start for $1
             </button>
-            <p className="text-xs text-slate-400 mt-4">Secure payment via Paddle</p>
+            <p className="text-xs text-slate-400 mt-4">First month $1, then $9.99/mo.</p>
         </div>
       </div>
     </LegalLayout>

@@ -2,14 +2,14 @@ import { ArrowLeft, ShoppingBag, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { DIGITAL_PRODUCTS } from '../features/shop/products';
-
-import { getPaddle, initPaddle } from '../lib/paddle';
-
+import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { supabase } from '../lib/supabase';
 
 export default function Shop() {
   
   const [purchasedItems, setPurchasedItems] = useState<string[]>([]);
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [userName, setUserName] = useState<string>('');
 
   useEffect(() => {
     const syncPurchases = async () => {
@@ -22,6 +22,9 @@ export default function Shop() {
         let dbIds: string[] = [];
         
         if (user) {
+            setUserEmail(user.email || '');
+            setUserName(user.user_metadata?.full_name || 'Parent');
+
             const { data } = await supabase
                 .from('user_purchases')
                 .select('product_id')
@@ -40,66 +43,73 @@ export default function Shop() {
     syncPurchases();
   }, []);
 
-  const handleBuy = async (priceId: string, productId: string) => {
-      // If already purchased, just redirect (Safety verify, though UI handles this too)
+  const handleBuy = async (amount: number, productId: string, title: string) => {
+      // If already purchased, just redirect
       if (purchasedItems.includes(productId)) {
            if (productId === 'script-book') window.location.href = '/print-script-book';
            return;
       }
 
-      let paddle = getPaddle();
-      const onEvent = async (data: any) => {
-          if (data.name === 'checkout.completed') {
-              // 1. Mark as purchased locally
-              localStorage.setItem(`purchased_${productId}`, 'true');
-              setPurchasedItems(prev => [...prev, productId]);
+      // Guest Handling: If no user, ask for email or just use a placeholder/prompt?
+      // Flutterwave requires an email. If not logged in, we should probably prompt or use a dummy for guest checkout if allowed?
+      // Better: Prompt for email if missing. For now, let's assume they might be guests and ask prompt.
+      let customerEmail = userEmail;
+      if (!customerEmail) {
+          const promptEmail = prompt("Please enter your email for the receipt:");
+          if (!promptEmail) return;
+          customerEmail = promptEmail;
+      }
 
-              // 2. Sync to Supabase if logged in
-              const { data: { user } } = await supabase.auth.getUser();
-              if (user) {
-                  const { error } = await supabase.from('user_purchases').insert({
-                      user_id: user.id,
-                      product_id: productId
-                  });
-                  if (error) console.error("Failed to save purchase to DB:", error);
-              }
-              
-              // 3. Redirect
-              if (productId === 'script-book') {
-                  window.location.href = window.location.origin + '/print-script-book';
-              }
-          }
+      const config = {
+        public_key: import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY || '',
+        tx_ref: Date.now() + '-' + productId,
+        amount: amount,
+        currency: 'USD',
+        payment_options: 'card,mobilemoney,ussd',
+        customer: {
+          email: customerEmail,
+          phone_number: '',
+          name: userName || 'Guest Parent',
+        },
+        customizations: {
+          title: title,
+          description: 'ParentingCertainty Digital Resource',
+          logo: 'https://cdn-icons-png.flaticon.com/512/2919/2919906.png', // Or app logo
+        },
       };
 
-      if (!paddle) {
-          const result = await initPaddle(onEvent);
-          if (result) paddle = result;
-      } else {
-        // If paddle was already init, we might miss the event callback registration if it was done in init.
-        // For simplicity in this one-off flow, we re-init or just rely on the fact that if it's open, 
-        // we can't easily attach a new global listener without re-init. 
-        // A better pattern for this specific library might be needed for robust global events, 
-        // but for this specific flow, let's try to update the callback if possible or just rely on the redirect for the *first* time.
-        // Actually, initPaddle updates the global callback if called again in our implementation? 
-        // Checked paddle.ts: It calls initializePaddle again. Paddle JS might warn but handle it.
-        // Let's explicitly pass the callback.
-        await initPaddle(onEvent);
-      }
+      const handleFlutterwavePayment = useFlutterwave(config);
 
-      if (paddle) {
-          paddle.Checkout.open({
-              items: [{ priceId: priceId, quantity: 1 }],
-              settings: {
-                  displayMode: 'overlay',
-                  theme: 'light',
-                  locale: 'en',
-                  // successUrl: successUrl // REMOVED: We handle redirect manually after saving state
-              }
-          });
-      } else {
-          console.error("Paddle failed to initialize. Check your API keys.");
-          alert("Payment system unavailable. Please try again later.");
-      }
+      handleFlutterwavePayment({
+        callback: async (response) => {
+           console.log(response);
+           closePaymentModal(); // this will close the modal programmatically
+           
+           if (response.status === 'successful') {
+                // 1. Mark as purchased locally
+                localStorage.setItem(`purchased_${productId}`, 'true');
+                setPurchasedItems(prev => [...prev, productId]);
+
+                // 2. Sync to Supabase if logged in
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { error } = await supabase.from('user_purchases').insert({
+                        user_id: user.id,
+                        product_id: productId
+                    });
+                     if (error) console.error("Failed to save purchase to DB:", error);
+                }
+                
+                // 3. Redirect
+                if (productId === 'script-book') {
+                    window.location.href = '/print-script-book';
+                }
+           }
+        },
+        onClose: () => {
+           // Do nothing
+        },
+      });
   };
 
   return (
@@ -138,7 +148,7 @@ export default function Shop() {
                         </p>
                         <div className="flex items-center gap-2 mb-6">
                             <Check size={14} className="text-green-500" />
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Sent to your email immediately</span>
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Instant Access + Email Backup</span>
                         </div>
                         
                         <button 
@@ -147,7 +157,7 @@ export default function Shop() {
                                 if (purchasedItems.includes(product.id)) {
                                     if (product.id === 'script-book') window.location.href = '/print-script-book';
                                 } else {
-                                    handleBuy(product.priceId, product.id);
+                                    handleBuy(product.price, product.id, product.title);
                                 }
                             }}
                             disabled={product.comingSoon}
